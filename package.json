@@ -1,0 +1,22 @@
+{
+  "name": "vim-digraphs",
+  "version": "0.1.0",
+  "description": "Vim-style Ctrl-K digraph entry in Obsidian's Vim mode",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "gen": "node scripts/gen-digraphs.mjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "0.21.5",
+    "obsidian": "latest",
+    "tslib": "2.6.2",
+    "typescript": "5.4.5"
+  }
+}

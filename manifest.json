@@ -1,0 +1,10 @@
+{
+  "id": "vim-digraphs",
+  "name": "Vim Digraphs",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "Vim-style Ctrl-K digraph entry in Obsidian's Vim mode. In insert mode, press Ctrl-K followed by a two-character mnemonic to insert the corresponding Unicode character.",
+  "author": "John Allison",
+  "authorUrl": "",
+  "isDesktopOnly": false
+}

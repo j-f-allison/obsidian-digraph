@@ -1,0 +1,25 @@
+// All undocumented Obsidian/CodeMirror/vim internals live here.
+// These paths are confirmed via obsidian-vimrc-support but are version-sensitive —
+// every access is guarded so breakage is contained to this module.
+import { MarkdownView } from 'obsidian';
+
+function getCm5(view: MarkdownView): any {
+  return (view as any).editMode?.editor?.cm?.cm;
+}
+
+export function isInInsertMode(view: MarkdownView): boolean {
+  return getCm5(view)?.state?.vim?.insertMode === true;
+}
+
+// Registers a callback for vim mode changes on the given view's CM5 object.
+// Returns an unregister function, or null if the CM5 object is unavailable.
+export function onVimModeChange(
+  view: MarkdownView,
+  cb: (mode: string) => void,
+): (() => void) | null {
+  const cm5 = getCm5(view);
+  if (!cm5) return null;
+  const handler = (e: any) => cb(e.mode as string);
+  cm5.on('vim-mode-change', handler);
+  return () => cm5.off('vim-mode-change', handler);
+}

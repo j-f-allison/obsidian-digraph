@@ -6,6 +6,63 @@ verified, what's next.
 
 ---
 
+## 2026-06-10 — Stage 2: full digraph table (Sonnet 4.6)
+
+Stage 1 acceptance criteria verified in a real vault by the user. Implemented Stage 2.
+
+**What changed:**
+- `scripts/gen-digraphs.mjs` — new Node.js script that fetches `runtime/doc/digraph.txt`
+  from `vim/vim` on GitHub, parses both the ASCII (`digraph-table`) and Unicode
+  (`digraph-table-mbyte`) sections, skips control characters (0x00–0x1F, 0x7F),
+  deduplicates on digraph key, sorts by codepoint, and writes `digraphs.ts`.
+- `digraphs.ts` — replaced the 4-entry Stage 1 stub with the auto-generated 1276-entry
+  full Vim table. Header comment instructs maintainers to regenerate, not hand-edit.
+- `package.json` — added `"gen": "node scripts/gen-digraphs.mjs"` script.
+
+**Verified:** `npm run gen` produces 1276 digraphs; `npm run build` passes clean;
+all four Stage 1 entries (`e'`→`é`, `e!`→`è`, `->`→`→`, `<-`→`←`) are present.
+
+**Open decisions (§6, unchanged):** unknown digraph → cancel silently; reverse-order
+codes → exact order only. Both remain as Stage 2 defaults, revisit in Stage 3.
+
+**Next:** test the full table in a dev vault; optionally begin Stage 3
+(command-line mode, settings tab, `{c}<BS>{c}` entry).
+
+---
+
+## 2026-06-10 — Stage 1 implementation (Sonnet 4.6)
+
+Scaffolded and implemented the full Stage 1 MVP. All files created; `tsc -noEmit`
+passes clean; production build produces `main.js` (3.4 KB).
+
+**Files created:**
+- `manifest.json`, `versions.json`, `styles.css` — plugin metadata/assets
+- `package.json`, `tsconfig.json` (strict), `esbuild.config.mjs` — build tooling
+  (TypeScript 5.4.5, esbuild 0.21.5)
+- `digraphs.ts` — hardcoded Stage 1 map: `e'`→`é`, `e!`→`è`, `->`→`→`, `<-`→`←`
+- `statusbar.ts` — `DigraphStatusBar` wrapping the Obsidian status-bar `HTMLElement`
+- `vim-bridge.ts` — single module for all undocumented internals; `isInInsertMode`
+  reads `cm5.state.vim.insertMode` via `editMode?.editor?.cm?.cm`
+- `capture.ts` — `DigraphCapture` IDLE→AWAIT1→AWAIT2 state machine; capture-phase
+  DOM keydown handler; cancels on Esc, on mode change, or on unknown code
+- `main.ts` — `VimDigraphsPlugin extends Plugin`; wires statusbar + capture;
+  registers one `document` keydown listener in capture phase
+
+**Decisions made during implementation:**
+- During AWAIT1/AWAIT2, mode is re-checked on every keydown (rather than via a
+  `vim-mode-change` listener) — sufficient for Stage 1 since Esc (the normal
+  exit) is caught by the state machine itself; the listener approach is deferred.
+- Pure modifier keydowns (Control, Shift, Alt, Meta) are ignored (not consumed)
+  during capture, per CLAUDE.md spec.
+
+**Not yet verified:** acceptance criteria require a real Obsidian vault — see
+CLAUDE.md §Testing. Install: symlink this directory into
+`<vault>/.obsidian/plugins/vim-digraphs/`, enable the plugin, walk PROJECT.md §7.
+
+**Next:** test in a dev vault against the Stage 1 acceptance criteria.
+
+---
+
 ## 2026-06-10 — Repo prep (Sonnet 4.6)
 
 Added `.gitignore` for the TypeScript/esbuild Obsidian plugin layout: ignores
