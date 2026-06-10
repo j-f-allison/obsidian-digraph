@@ -1,1 +1,52 @@
-/* Vim Digraphs plugin — no custom styles needed for Stage 1 */
+/* Cursor hint shown while awaiting digraph input */
+.vim-digraph-cursor-hint {
+  color: var(--text-faint);
+  font-style: italic;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Digraph table modal */
+.vim-digraph-modal .vim-digraph-search {
+  width: 100%;
+  margin-bottom: 0.75em;
+}
+
+.vim-digraph-table-wrap {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.vim-digraph-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-monospace);
+  font-size: var(--font-smaller);
+}
+
+.vim-digraph-table th,
+.vim-digraph-table td {
+  padding: 2px 8px;
+  text-align: left;
+}
+
+.vim-digraph-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--background-primary);
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.vim-digraph-code {
+  color: var(--text-accent);
+  min-width: 3em;
+}
+
+.vim-digraph-char {
+  min-width: 2em;
+  font-size: 1.1em;
+}
+
+.vim-digraph-cp {
+  color: var(--text-muted);
+}

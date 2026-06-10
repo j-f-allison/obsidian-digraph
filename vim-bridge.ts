@@ -1,10 +1,15 @@
 // All undocumented Obsidian/CodeMirror/vim internals live here.
 // These paths are confirmed via obsidian-vimrc-support but are version-sensitive —
 // every access is guarded so breakage is contained to this module.
+import { EditorView } from '@codemirror/view';
 import { MarkdownView } from 'obsidian';
 
 function getCm5(view: MarkdownView): any {
   return (view as any).editMode?.editor?.cm?.cm;
+}
+
+export function getCm6(view: MarkdownView): EditorView | undefined {
+  return (view as any).editMode?.editor?.cm ?? undefined;
 }
 
 export function isInInsertMode(view: MarkdownView): boolean {
@@ -22,4 +27,11 @@ export function onVimModeChange(
   const handler = (e: any) => cb(e.mode as string);
   cm5.on('vim-mode-change', handler);
   return () => cm5.off('vim-mode-change', handler);
+}
+
+// Registers a Vim Ex command (e.g. :digraphs). Best-effort: silently skips if
+// the global Vim adapter is unavailable.
+export function defineVimExCommand(name: string, callback: () => void): void {
+  const Vim = (window as any).CodeMirrorAdapter?.Vim;
+  Vim?.defineEx?.(name, '', () => callback());
 }

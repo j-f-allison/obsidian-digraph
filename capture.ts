@@ -1,7 +1,8 @@
 import { App, MarkdownView } from 'obsidian';
 import { DIGRAPHS } from './digraphs';
+import { setDigraphHint } from './cursor-hint';
 import { DigraphStatusBar } from './statusbar';
-import { isInInsertMode, onVimModeChange } from './vim-bridge';
+import { getCm6, isInInsertMode, onVimModeChange } from './vim-bridge';
 
 type State = 'IDLE' | 'AWAIT1' | 'AWAIT2';
 
@@ -62,6 +63,8 @@ export class DigraphCapture {
       e.stopPropagation();
       this.state = 'AWAIT1';
       this.statusBar.show('^K');
+      const cm6 = getCm6(view);
+      if (cm6) setDigraphHint(cm6, true);
       this.modeChangeOff = onVimModeChange(view, (mode) => {
         if (mode !== 'insert') this.reset();
       });
@@ -74,5 +77,10 @@ export class DigraphCapture {
     this.modeChangeOff?.();
     this.modeChangeOff = null;
     this.statusBar.hide();
+    const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+    if (view) {
+      const cm6 = getCm6(view);
+      if (cm6) setDigraphHint(cm6, false);
+    }
   }
 }

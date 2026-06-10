@@ -6,6 +6,46 @@ verified, what's next.
 
 ---
 
+## 2026-06-10 — Stage 3 partial: cursor hint + :digraphs modal (Sonnet 4.6)
+
+**What changed:**
+
+- `cursor-hint.ts` (new) — CM6 `StateField` + `WidgetDecoration` that renders a
+  greyed-out `?` at the cursor while the state machine is in AWAIT1 or AWAIT2.
+  Cleared on reset and on any document/selection change (mouse click etc.).
+- `digraphs-modal.ts` (new) — Obsidian `Modal` with a search input and a scrollable
+  table (code | char | codepoint) of all 1276 digraphs. Filtering matches on
+  digraph code substring or exact character value.
+- `vim-bridge.ts` — added `getCm6` (returns the CM6 `EditorView`) and
+  `defineVimExCommand` (registers a Vim Ex command via `Vim.defineEx`).
+- `capture.ts` — calls `setDigraphHint(cm6, true)` on Ctrl-K and
+  `setDigraphHint(cm6, false)` on reset.
+- `main.ts` — `registerEditorExtension([digraphCursorExtension])`, registers
+  `show-digraph-table` command, wires `:digraphs` as a Vim Ex command
+  (deferred to `onLayoutReady` so the Vim adapter is initialized).
+- `styles.css` — styles for `.vim-digraph-cursor-hint` and the modal.
+
+**n~ clarification:** `n~` is not a bug. Vim's RFC-1345 table uses `?` (question
+mark) as the combining tilde diacritic marker, so ñ is `n?`, ã is `a?`, etc.
+This is confirmed by the raw bytes in `digraph.txt`. Users expecting `n~` should
+use `n?` instead. Note: nvim 0.12.2 does support both `n~` and `n?` as aliases
+(nvim has duplicate entries; we deduplicate on first-by-codepoint). Leaving as-is
+per user decision — if alias support is ever added it should live in the generator.
+
+**:digraph vs :digraphs:** nvim accepts both `:digraph` and `:digraphs`. We only
+register `:digraphs`; adding `:digraph` as an alias would be a one-liner in
+`defineVimExCommand` but was explicitly left out.
+
+**Verified:** `npm run build` passes clean.
+
+**Not yet verified in vault:** cursor hint appearance, `:digraphs` Ex command
+availability, modal search/filtering.
+
+**Next:** test in dev vault; consider Stage 3 remaining items (`{c}<BS>{c}` entry,
+settings tab, command-line mode digraphs).
+
+---
+
 ## 2026-06-10 — Stage 2: full digraph table (Sonnet 4.6)
 
 Stage 1 acceptance criteria verified in a real vault by the user. Implemented Stage 2.
