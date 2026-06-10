@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Build output
+main.js
+main.js.map
+
+# TypeScript
+*.js.map
+
+# esbuild
+.hotreload
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Env / secrets
+.env
+.env.local
+
+# Test vault (if dev vault is inside the project)
+test-vault/
+dev-vault/
