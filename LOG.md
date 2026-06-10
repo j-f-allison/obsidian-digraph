@@ -6,6 +6,53 @@ verified, what's next.
 
 ---
 
+## 2026-06-10 — Stage 3 complete (Sonnet 4.6)
+
+**What changed:**
+
+- `settings.ts` (new) — `VimDigraphSettings` interface + defaults + `DigraphSettingTab`.
+  Settings: `cmdlineDigraphs` (off by default), `bsDigraphs` (off by default),
+  `customDigraphs: Record<string,string>`. Custom digraphs override built-in ones
+  with the same code. Settings persisted via `loadData`/`saveData`.
+- `capture.ts` — significant rewrite:
+  - `CaptureMode: 'editor' | 'cmdline'` tracks where the active capture was triggered.
+  - New state `BS_AWAIT2`: entered when `bsDigraphs` is enabled, the user types a
+    char then presses Backspace, and the char before cursor matches the tracked char.
+    The Backspace is consumed; if a digraph is found the char is deleted and the
+    digraph inserted; if unknown the deferred Backspace fires and char2 types normally.
+  - Ctrl-K now also fires in command-line mode (when `cmdlineDigraphs` is on):
+    checks `isVimCommandLineActive()` in addition to `isInInsertMode()`.
+  - `lookup()` merges `customDigraphs` (takes priority) with `DIGRAPHS`.
+  - `performBackspace()` helper deletes one character before the cursor via
+    `replaceRange`.
+  - Constructor now takes `settings: VimDigraphSettings` as a third argument.
+- `vim-bridge.ts` — added `isVimCommandLineActive()` (checks `document.activeElement`
+  inside `.cm-vim-panel`) and `insertIntoCommandLine()` (manipulates the input value
+  at the selection cursor and dispatches an `input` event).
+- `main.ts` — loads and saves settings (`loadData`/`saveData`), registers
+  `DigraphSettingTab`, passes `this.settings` to `DigraphCapture`.
+- `styles.css` — styles for the custom digraphs settings UI (add form + list).
+
+**Design decisions:**
+- `bsDigraphs` and `cmdlineDigraphs` are off by default to preserve existing
+  behavior for users who don't want these features.
+- `lastTypedChar` tracking only applies when `bsDigraphs` is enabled, to avoid
+  unnecessary overhead.
+- For `BS_AWAIT2` + Escape: the Backspace fires (char1 deleted) and Escape is
+  NOT prevented, so Vim exits insert mode normally.
+- For `BS_AWAIT2` + non-printable key (Tab, Enter, arrow): the Backspace fires
+  and the non-printable key passes through.
+- The command-line class selector `.cm-vim-panel` is best-effort (undocumented
+  Obsidian/CM6 vim internal); `isVimCommandLineActive` silently returns false if
+  the element structure changes.
+
+**Verified:** `npm run build` passes clean.
+
+**Not yet verified in vault:** settings tab UI, `bsDigraphs` entry, command-line
+mode Ctrl-K, custom digraph override.
+
+---
+
 ## 2026-06-10 — Stage 3 partial: cursor hint + :digraphs modal (Sonnet 4.6)
 
 **What changed:**

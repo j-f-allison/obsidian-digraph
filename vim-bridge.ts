@@ -35,3 +35,22 @@ export function defineVimExCommand(name: string, callback: () => void): void {
   const Vim = (window as any).CodeMirrorAdapter?.Vim;
   Vim?.defineEx?.(name, '', () => callback());
 }
+
+// Returns true when Vim's command-line input (for : / ? commands) is focused.
+// Relies on the CM6 vim panel DOM structure — best-effort.
+export function isVimCommandLineActive(): boolean {
+  const el = document.activeElement;
+  if (!(el instanceof HTMLInputElement)) return false;
+  return el.closest('.cm-vim-panel') !== null;
+}
+
+// Inserts text at the cursor position in the focused command-line input.
+export function insertIntoCommandLine(char: string): void {
+  const el = document.activeElement;
+  if (!(el instanceof HTMLInputElement)) return;
+  const start = el.selectionStart ?? el.value.length;
+  const end = el.selectionEnd ?? start;
+  el.value = el.value.slice(0, start) + char + el.value.slice(end);
+  el.setSelectionRange(start + char.length, start + char.length);
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+}

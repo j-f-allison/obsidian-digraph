@@ -2,13 +2,20 @@ import { Plugin } from 'obsidian';
 import { DigraphCapture } from './capture';
 import { digraphCursorExtension } from './cursor-hint';
 import { DigraphsModal } from './digraphs-modal';
+import { DEFAULT_SETTINGS, DigraphSettingTab, VimDigraphSettings } from './settings';
 import { DigraphStatusBar } from './statusbar';
 import { defineVimExCommand } from './vim-bridge';
 
 export default class VimDigraphsPlugin extends Plugin {
+  settings!: VimDigraphSettings;
+
   async onload(): Promise<void> {
+    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+
+    this.addSettingTab(new DigraphSettingTab(this.app, this));
+
     const statusBar = new DigraphStatusBar(this.addStatusBarItem());
-    const capture = new DigraphCapture(this.app, statusBar);
+    const capture = new DigraphCapture(this.app, statusBar, this.settings);
 
     this.registerEditorExtension([digraphCursorExtension]);
 
@@ -25,10 +32,12 @@ export default class VimDigraphsPlugin extends Plugin {
       callback: () => new DigraphsModal(this.app).open(),
     });
 
-    // Also wire :digraphs as a Vim Ex command. The Vim adapter may not be
-    // initialized yet at plugin load, so we defer until the workspace is ready.
     this.app.workspace.onLayoutReady(() => {
       defineVimExCommand('digraphs', () => new DigraphsModal(this.app).open());
     });
+  }
+
+  async saveSettings(): Promise<void> {
+    await this.saveData(this.settings);
   }
 }

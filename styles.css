@@ -50,3 +50,38 @@
 .vim-digraph-cp {
   color: var(--text-muted);
 }
+
+/* Custom digraphs settings UI */
+.vim-digraph-add-row {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  margin-top: 0.75em;
+}
+
+.vim-digraph-add-code {
+  width: 5em;
+  font-family: var(--font-monospace);
+}
+
+.vim-digraph-add-char {
+  width: 3em;
+  font-family: var(--font-monospace);
+}
+
+.vim-digraph-custom-list {
+  margin: 0.5em 0 0.75em;
+}
+
+.vim-digraph-custom-row {
+  display: flex;
+  gap: 0.5em;
+  align-items: center;
+  padding: 3px 0;
+  font-family: var(--font-monospace);
+  font-size: var(--font-smaller);
+}
+
+.vim-digraph-remove-btn {
+  margin-left: auto;
+}
